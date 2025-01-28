@@ -93,14 +93,12 @@ export default function BasicMenu() {
         onClose={handleClose}
       >
         <MenuItem onClick={handleClose} disableRipple>
-          <EditIcon />
-          Edit
+          orders
         </MenuItem>
         <Divider sx={{ my: 0.5 }} />
         
         <MenuItem onClick={handleClose} disableRipple>
-          <MoreHorizIcon />
-          More
+          returned orders
         </MenuItem>
       </StyledMenu>
     </div>

@@ -1,30 +1,52 @@
-import * as React from 'react';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
+import * as React from "react";
+import { Stack, Typography, Button } from "@mui/material";
 import { CiCircleQuestion } from "react-icons/ci";
-import { Stack, Typography } from '@mui/material';
 import { RiArrowDropDownLine } from "react-icons/ri";
-import Button from '@mui/material/Button';
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { RiExternalLinkLine } from "react-icons/ri";
-import { FiBox } from "react-icons/fi";
+import { AgGridReact } from "ag-grid-react";
+import "ag-grid-community/styles/ag-grid.css"; // AG Grid Core Styles
+import "ag-grid-community/styles/ag-theme-alpine.css"; // AG Grid Alpine Theme
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 export default function DayChecklist() {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState([]); // Dynamic data state
+  console.log(data);
 
+  // Define column definitions matching the data structure
+  const [columnDefs] = useState([
+    { field: "scenario", headerName: "Scenario", sortable: true, filter: true },
+    { field: "name", headerName: "Name", sortable: true, filter: true },
+    { field: "summary", headerName: "Summary", sortable: true, filter: true },
+    {
+      field: "status",
+      headerName: "Status",
+      sortable: true,
+      filter: true,
+      cellRendererFramework: (params) => {
+        return params.value ? (
+          <Button variant="contained" color="success">
+            Success
+          </Button>
+        ) : (
+          <Button variant="outlined" color="error">
+            Error
+          </Button>
+        );
+      },
+    },
+    { field: "id", headerName: "ID", sortable: true, filter: true },
+  ]);
+
+  // Fetch data from the API
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get('https://679474ccaad755a134e9896e.mockapi.io/screen/dailyck');
-        setData(res.data);
+        const res = await axios.get(
+          "https://679474ccaad755a134e9896e.mockapi.io/screen/dailyck"
+        );
+        setData(res.data); // Update state with fetched data
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       }
     };
     fetchData();
@@ -32,9 +54,8 @@ export default function DayChecklist() {
 
   return (
     <>
-     
-      <TableContainer component={Paper} sx={{ marginTop: 0.5,boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.7)" }}>
-      <Stack direction="row" spacing={3} sx={{ margin:1.9 }}>
+      {/* Buttons and Filters */}
+      <Stack direction="row" spacing={3} sx={{ margin: 1.9 }}>
         <Button variant="outlined">
           Daily Checklist <CiCircleQuestion size={25} />
         </Button>
@@ -45,51 +66,31 @@ export default function DayChecklist() {
           Status <RiArrowDropDownLine size={25} />
         </Button>
       </Stack>
+
+      {/* Last Updated Info */}
       <div>
-        <Typography variant="caption" sx={{ marginLeft:2,marginTop:0}} >Updated on: 10:30 PM, 23 Apr 2025</Typography>
+        <Typography variant="caption" sx={{ marginLeft: 2, marginTop: 0 }}>
+          Updated on: 10:30 PM, 23 Apr 2025
+        </Typography>
       </div>
-        <Table sx={{ minWidth: 650 , margin:1,boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.6)"}} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>SCENARIO</TableCell>
-              <TableCell align="right">NAME</TableCell>
-              <TableCell align="right">SUMMARY</TableCell>
-              <TableCell align="right">STATUS</TableCell>
-              <TableCell align="right">ACTIONS</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.map((row) => (
-              <TableRow
-                key={row.id} // Ensure `id` exists in the API data
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                <FiBox /> {row.scenario}
-                </TableCell>
-                <TableCell align="right">{row.name}</TableCell>
-                <TableCell align="right">{row.summary}</TableCell>
-                <TableCell align="right">
-                  {row.status ? (
-                    <Button variant="contained" color="success">
-                      Success
-                    </Button>
-                  ) : (
-                    <Button variant="outlined" color="error">
-                      Error
-                    </Button>
-                  )}
-                </TableCell>
-                <TableCell align="right">
-                  <a href="https://youtube.com" style={{ textDecoration: 'none', color: 'blue' }}>
-                    <RiExternalLinkLine /> View Details
-                  </a>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+
+      {/* AG Grid Table */}
+      <div
+        className="ag-theme-alpine"
+        style={{
+          height: 400,
+          width: "100%",
+          marginTop: "20px",
+        }}
+      >
+        <AgGridReact
+          rowData={data} // Use dynamic data fetched from API
+          columnDefs={columnDefs}
+          defaultColDef={{ filter: true, sortable: true }}
+          // paginationPageSize={5}
+          // pagination={true}
+        />
+      </div>
     </>
   );
 }
