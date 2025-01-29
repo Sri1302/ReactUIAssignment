@@ -101,11 +101,20 @@ export default function DayChecklist() {
           {
             data: chartData.values, // Summary data for the bars
             type: "bar",
+            itemStyle:{color:"#23f"},
+            label:{show:true,postion:"top"}
           },
         ],
       };
 
+     
       chartInstance.setOption(option);
+
+      const resize= () =>{
+        chartInstance.resize()
+      }
+      
+      window.addEventListener("resize",resize)
 
       return () => {
         chartInstance.dispose(); // Clean up chart instance on component unmount
@@ -148,8 +157,8 @@ export default function DayChecklist() {
           rowData={data} // Use dynamic data fetched from API
           columnDefs={columnDefs}
           defaultColDef={{ filter: true, sortable: true }}
-          pagination={true}
-          paginationPageSize={5}
+          // pagination={true}
+          // paginationPageSize={5}
         />
       </div>
 
@@ -158,7 +167,7 @@ export default function DayChecklist() {
         ref={chartRef}
         style={{
           height: 400,
-          width: "100%",
+          width: "85%",
           marginTop: "20px",
         }}
       ></div>
